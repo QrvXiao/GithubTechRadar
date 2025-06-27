@@ -12,10 +12,7 @@ app.use(cors());
 app.use(express.json()); // 解析 JSON 请求体
 
 // 连接 MongoDB Atlas
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
 
