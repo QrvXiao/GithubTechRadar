@@ -1,0 +1,136 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.language-filter {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 80vh;
+  background: #f9fafb; /* 统一为页面背景色 */
+  border-right: 1px solid #eee;
+  z-index: 20;
+  transition: min-width 0.2s;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.language-filter.expanded {
+  min-width: 200px;
+  align-items: flex-start;
+  padding: 16px;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+  transform: translateX(0);
+}
+
+.language-filter.collapsed {
+  min-width: 40px;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.language-filter label {
+  display: block;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.language-filter input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.language-filter-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+.language-filter-action-btn {
+  font-size: 12px;
+  width: 100%;
+}
+
+.legend {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  background: #f9fafb;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 12px 20px;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
+  z-index: 30;
+  font-size: 16px;
+  color: #222;
+}
+
+.app-background {
+  min-height: 70vh;
+  background: #fff;
+  padding-top: 40px;
+  position: relative;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 32px;
+  font-weight: bold;
+  font-size: 2rem;
+  z-index: 2;
+  position: relative;
+}
+
+.plot-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.loading-text {
+  color: #6b7280;
+}
+
+.error-text {
+  color: #ef4444;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
