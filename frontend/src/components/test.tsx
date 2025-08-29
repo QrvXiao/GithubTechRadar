@@ -1,6 +1,7 @@
+import React from 'react';
 import Plot from 'react-plotly.js';
 
-export default function PolarZoomTest() {
+export default function PolarZoomTest(): JSX.Element {
   return (
     <Plot
       data={[

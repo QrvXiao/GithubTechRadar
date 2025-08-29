@@ -1,20 +1,19 @@
 import React, { useRef } from 'react';
 import Plot from 'react-plotly.js';
+import { PolarScatterPlotProps } from '../types';
 
-const PolarScatterPlot = ({ data }) => {
-  const ignoreNextClick = useRef(false);
+const PolarScatterPlot: React.FC<PolarScatterPlotProps> = ({ data }) => {
+  const ignoreNextClick = useRef<boolean>(false);
 
-  const handleDoubleClick = () => {
+  const handleDoubleClick = (): void => {
     ignoreNextClick.current = true;
-    // Reset the flag after a short delay
     setTimeout(() => {
       ignoreNextClick.current = false;
     }, 300);
   };
 
-  const handleClick = (event) => {
+  const handleClick = (event: any): void => {
     if (ignoreNextClick.current) {
-      // Ignore this click, it's from a double-click zoom reset
       return;
     }
     if (event.points && event.points.length > 0) {
@@ -31,9 +30,11 @@ const PolarScatterPlot = ({ data }) => {
       <Plot
         data={data}
         layout={{
-          width: 750,
-          height: 800,
+          autosize: true,
+          margin: { t: 40, l: 40, r: 40, b: 40 },
         }}
+        useResizeHandler={true}
+        style={{ width: '100%', height: '100%' }}
         config={{
           scrollZoom: true,
         }}

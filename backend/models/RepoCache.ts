@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const RepoCacheSchema = new mongoose.Schema({
   fetchedAt: { type: Date, required: true },
   items: { type: Array, required: true }
 });
 
-module.exports = mongoose.model('RepoCache', RepoCacheSchema);
+export default mongoose.model('RepoCache', RepoCacheSchema);

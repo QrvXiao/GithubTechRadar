@@ -1,5 +1,13 @@
 {
-  "dependencies": {
-    "recharts": "^2.15.3"
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "name": "tech-radar",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm start",
+    "build": "cd backend && npm run build",
+    "start": "cd backend && npm start"
   }
 }
