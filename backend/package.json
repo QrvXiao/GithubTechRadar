@@ -4,7 +4,8 @@
   "main": "dist/server.js",
   "scripts": {
     "start": "node dist/server.js",
-    "dev": "ts-node server.ts",
+    "dev": "ts-node --transpile-only server.ts",
+    "dev:check": "tsc --noEmit && ts-node server.ts",
     "build": "tsc",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean"

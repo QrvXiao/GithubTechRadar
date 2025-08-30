@@ -26,6 +26,14 @@ export const transformToPlotlyData = (repos: GitHubRepo[]): PlotlyData[] => {
   }];
 };
 
+interface LanguageStats {
+  totalStars: number;
+  totalForks: number;
+  repositoryCount: number;
+  repositories: GitHubRepo[];
+}
+
+
 export const aggregateLanguageData = (repos: GitHubRepo[]) => {
   const languageStats = new Map();
 
@@ -52,7 +60,7 @@ export const aggregateLanguageData = (repos: GitHubRepo[]) => {
     ...stats,
     trendingScore: calculateTrendingScore(stats),
     topRepositories: stats.repositories
-      .sort((a, b) => b.stargazers_count - a.stargazers_count)
+      .sort((a: GitHubRepo, b: GitHubRepo) => b.stargazers_count - a.stargazers_count)
       .slice(0, 5)
   }));
 };

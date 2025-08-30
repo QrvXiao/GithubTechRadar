@@ -56,8 +56,9 @@ class GitHubService {
       return processedData;
 
     } catch (error) {
-      logger.error('GitHub API fetch error:', error.message);
-      throw new Error(`Failed to fetch data from GitHub: ${error.message}`);
+      const errorObj = error instanceof Error ? error : new Error(String(error));
+      logger.error('GitHub API fetch error:', errorObj.message);
+      throw new Error(`Failed to fetch data from GitHub: ${errorObj.message}`);
     }
   }
 
