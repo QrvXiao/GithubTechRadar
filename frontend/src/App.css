@@ -229,6 +229,70 @@
   padding: 2rem;
 }
 
+
+@media (max-width: 768px) {
+  .navigation {
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .nav-brand a {
+    font-size: 1.2rem;
+  }
+  
+  .nav-links {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .nav-link {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .main-content {
+    padding: 1rem 0.5rem;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .home-page {
+    padding: 2rem 1rem;
+  }
+  
+  .home-actions {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: center;
+  }
+  
+  .nav-button {
+    padding: 0.8rem 1.5rem;
+    width: 200px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .navigation {
+    padding: 0.5rem;
+  }
+  
+  .nav-links {
+    width: 100%;
+    justify-content: space-around;
+    margin-top: 0.5rem;
+  }
+  
+  .nav-link {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .main-content {
+    padding: 0.5rem;
+  }
+}
+
 .home-page {
   text-align: center;
   padding: 4rem 2rem;
