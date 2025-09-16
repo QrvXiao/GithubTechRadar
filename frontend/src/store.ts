@@ -3,6 +3,7 @@ import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface LanguageState {
   allLanguages: string[];
   selectedLanguages: string[];
+  isInitialized: boolean;
 }
 
 const languageSlice = createSlice({
@@ -10,17 +11,19 @@ const languageSlice = createSlice({
   initialState: {
     allLanguages: [],
     selectedLanguages: [],
+    isInitialized: false,
   } as LanguageState,
   reducers: {
     setAllLanguages(state, action: PayloadAction<string[]>) {
       state.allLanguages = action.payload;
       state.selectedLanguages = action.payload;
+      state.isInitialized = true;
     },
     setSelectedLanguages(state, action: PayloadAction<string[]>) {
       state.selectedLanguages = action.payload;
     },
     checkAll(state) {
-      state.selectedLanguages = [...state.allLanguages]; // ✅ 创建新数组
+      state.selectedLanguages = [...state.allLanguages];
     },
     uncheckAll(state) {
       state.selectedLanguages = [];

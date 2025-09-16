@@ -3,6 +3,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import apiRoutes from './routes/api';
+import routerRoutes from './routes/router';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -20,6 +21,7 @@ mongoose.connect(process.env.MONGODB_URI as string)
 
 // routes 
 app.use('/api', apiRoutes);
+app.use('/api', routerRoutes);
 
 // Basic route
 app.get('/', (req: Request, res: Response) => {

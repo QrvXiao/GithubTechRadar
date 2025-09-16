@@ -1,6 +1,24 @@
 import { GitHubRepo, PlotlyData } from '../types';
+import cacheService from './cacheService';
+
+interface LanguageStats {
+  totalStars: number;
+  totalForks: number;
+  repositoryCount: number;
+  repositories: GitHubRepo[];
+}
 
 export const transformToPlotlyData = (repos: GitHubRepo[]): PlotlyData[] => {
+  // ✅ 创建缓存键（基于数据内容的哈希）
+  const dataHash = repos.map(r => `${r.id}-${r.stargazers_count}`).join('').slice(0, 50);
+  const cacheKey = `plotly-${dataHash}`;
+
+  const cached = cacheService.get(cacheKey);
+  if (cached) {
+    console.log('🎯 Using cached plotly data');
+    return cached;
+  }
+
   const cleanRepos = repos.filter(repo => 
     repo.language && typeof repo.stargazers_count === 'number'
   );
@@ -13,7 +31,7 @@ export const transformToPlotlyData = (repos: GitHubRepo[]): PlotlyData[] => {
   );
   const customdata = cleanRepos.map(repo => repo.html_url);
 
-  return [{
+  const result: PlotlyData[] = [{
     type: 'scatterpolar',
     mode: 'markers',
     r,
@@ -24,18 +42,24 @@ export const transformToPlotlyData = (repos: GitHubRepo[]): PlotlyData[] => {
     marker: { size: 8 },
     name: 'Trending Repos',
   }];
+
+  // ✅ 缓存30分钟
+  cacheService.set(cacheKey, result, 30);
+  return result;
 };
 
-interface LanguageStats {
-  totalStars: number;
-  totalForks: number;
-  repositoryCount: number;
-  repositories: GitHubRepo[];
-}
-
-
 export const aggregateLanguageData = (repos: GitHubRepo[]) => {
-  const languageStats = new Map();
+  // ✅ 创建缓存键
+  const dataHash = repos.map(r => r.id).join('-').slice(0, 50);
+  const cacheKey = `aggregate-${dataHash}`;
+
+  const cached = cacheService.get(cacheKey);
+  if (cached) {
+    console.log('🎯 Using cached aggregate data');
+    return cached;
+  }
+
+  const languageStats = new Map<string, LanguageStats>();
 
   repos.forEach(repo => {
     if (!repo.language) return;
@@ -55,7 +79,7 @@ export const aggregateLanguageData = (repos: GitHubRepo[]) => {
     languageStats.set(repo.language, stats);
   });
 
-  return Array.from(languageStats.entries()).map(([language, stats]) => ({
+  const result = Array.from(languageStats.entries()).map(([language, stats]) => ({
     language,
     ...stats,
     trendingScore: calculateTrendingScore(stats),
@@ -63,10 +87,23 @@ export const aggregateLanguageData = (repos: GitHubRepo[]) => {
       .sort((a: GitHubRepo, b: GitHubRepo) => b.stargazers_count - a.stargazers_count)
       .slice(0, 5)
   }));
+
+  // ✅ 缓存30分钟
+  cacheService.set(cacheKey, result, 30);
+  return result;
 };
 
-function calculateTrendingScore(stats: any): number {
+function calculateTrendingScore(stats: LanguageStats): number {
   const starScore = Math.log(stats.totalStars + 1) * 10;
   const repoScore = stats.repositoryCount * 5;
   return Math.round(starScore + repoScore);
 }
+
+// ✅ 导出缓存控制函数
+export const clearProcessorCache = () => {
+  const keys = cacheService.keys().filter(key => 
+    key.startsWith('plotly-') || key.startsWith('aggregate-')
+  );
+  keys.forEach(key => cacheService.delete(key));
+  console.log(`Cleared ${keys.length} processor cache entries`);
+};
