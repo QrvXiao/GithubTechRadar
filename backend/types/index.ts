@@ -11,6 +11,7 @@ export interface Repository {
 }
 
 export interface GitHubRepo {
+  id: number; 
   name: string;
   full_name: string;
   html_url: string;
@@ -20,6 +21,7 @@ export interface GitHubRepo {
   language?: string;
   created_at: string;
   updated_at: string;
+  topics?: string[];
 }
 
 export interface PlotlyData {
