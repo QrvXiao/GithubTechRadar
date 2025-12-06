@@ -16,7 +16,8 @@ export const validateQuery = (req: Request, res: Response, next: NextFunction) =
     });
   }
   
-  req.query = value;
+  // 将验证后的值存储到req对象中，而不是覆盖req.query
+  (req as any).validatedQuery = value;
   next();
 };
 

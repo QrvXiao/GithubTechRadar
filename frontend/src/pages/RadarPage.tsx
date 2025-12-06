@@ -1,9 +1,8 @@
-import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import React, { useEffect, useMemo, useCallback, useRef } from 'react';
 import PolarScatterPlot from '../components/PolarScatterPlot';
 import LanguageFilter from '../components/LanguageFilter';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
-import { FrontendPlotlyData } from '../types'; 
 import './RadarPage.css';
 import { usePersistedCache } from '../hooks/useCache';
 import {
@@ -21,9 +20,15 @@ function RadarPage() {
   const languagesInitialized = useRef(false);
 
   const fetcher = useCallback(async () => {
-    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/api/trending');
+    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/api/radar-data?timeRange=7d&limit=100');
     if (!res.ok) throw new Error('API fetch failed');
-    return res.json();
+    const result = await res.json();
+    
+    // 后端已经返回PlotlyData格式
+    if (result.success && result.data) {
+      return result.data;
+    }
+    throw new Error(result.message || 'Failed to fetch data');
   }, []);
 
   const { 
@@ -125,10 +130,16 @@ function RadarPage() {
         <h1>Tech Radar</h1>
         <p>Trending GitHub Repositories Visualization</p>
         {!loading && (
-          <small style={{ color: '#64748b' }}>
-            📊 Data loaded {fromCache ? 'from cache' : 'from API'}
-            {isInitialized && ` • ${selectedLanguages.length}/${allLanguages.length} languages selected`}
-          </small>
+          <div style={{ marginTop: '8px' }}>
+            <small style={{ color: '#64748b' }}>
+              📊 Data loaded {fromCache ? 'from cache' : 'from API'}
+              {isInitialized && ` • ${selectedLanguages.length}/${allLanguages.length} languages selected`}
+            </small>
+            <br />
+            <small style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
+              💡 Data is automatically updated weekly. Last refresh: {fromCache ? 'cached' : 'just now'}
+            </small>
+          </div>
         )}
       </div>
 
