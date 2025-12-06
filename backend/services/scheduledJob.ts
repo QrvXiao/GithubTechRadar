@@ -2,6 +2,7 @@ import * as cron from 'node-cron';
 import githubService from './githubService';
 import { aggregateLanguageData } from './dataProcessor';
 import TechRadar from '../models/TechRadar';
+import RepoData from '../models/RepoData';
 import { logger } from '../utils/logger';
 
 class ScheduledJobService {
@@ -63,20 +64,28 @@ class ScheduledJobService {
             continue;
           }
 
-          // 聚合处理数据
-          const processedData = aggregateLanguageData(githubData);
-          
-          // 保存到MongoDB（更新或插入）
-          for (const item of processedData) {
-            await TechRadar.findOneAndUpdate(
+          // ✅ 保存每个repo的数据（而不是聚合数据）
+          for (const repo of githubData) {
+            if (!repo.language) continue;
+            
+            await RepoData.findOneAndUpdate(
               { 
-                language: item.language, 
+                repoId: repo.id,
                 timeRange: timeRange 
               },
-              { 
-                ...item,
-                timeRange: timeRange,
-                lastUpdated: new Date()
+              {
+                repoId: repo.id,
+                name: repo.name,
+                fullName: repo.full_name,
+                url: repo.html_url,
+                description: repo.description,
+                stars: repo.stargazers_count,
+                forks: repo.forks_count,
+                language: repo.language,
+                createdAt: new Date(repo.created_at),
+                updatedAt: new Date(repo.updated_at),
+                lastFetched: new Date(),
+                timeRange: timeRange
               },
               { 
                 upsert: true, 
@@ -86,7 +95,7 @@ class ScheduledJobService {
           }
 
           successCount++;
-          logger.info(`✅ Cached ${processedData.length} items for ${language || 'all'} - ${timeRange}`);
+          logger.info(`✅ Cached ${githubData.length} repos for ${language || 'all'} - ${timeRange}`);
           
           // 避免频繁请求API，添加延迟
           await this.sleep(2000);
@@ -106,11 +115,15 @@ class ScheduledJobService {
     try {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
       
-      const result = await TechRadar.deleteMany({
+      const result1 = await TechRadar.deleteMany({
         lastUpdated: { $lt: thirtyDaysAgo }
       });
 
-      logger.info(`🗑️ Cleaned up ${result.deletedCount} old records`);
+      const result2 = await RepoData.deleteMany({
+        lastFetched: { $lt: thirtyDaysAgo }
+      });
+
+      logger.info(`🗑️ Cleaned up ${result1.deletedCount} aggregated records and ${result2.deletedCount} repo records`);
     } catch (error) {
       logger.error('❌ Error during cleanup:', error);
     }

@@ -20,15 +20,9 @@ function RadarPage() {
   const languagesInitialized = useRef(false);
 
   const fetcher = useCallback(async () => {
-    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/api/radar-data?timeRange=7d&limit=100');
+    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/api/trending');
     if (!res.ok) throw new Error('API fetch failed');
-    const result = await res.json();
-    
-    // 后端已经返回PlotlyData格式
-    if (result.success && result.data) {
-      return result.data;
-    }
-    throw new Error(result.message || 'Failed to fetch data');
+    return res.json();
   }, []);
 
   const { 
