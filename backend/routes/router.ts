@@ -129,7 +129,7 @@ router.get('/radar-data', validateQuery, async (req: Request, res: Response) => 
 
     res.json({
       success: true,
-      data: plotlyData, // 直接返回PlotlyData格式
+      data: plotlyData, // Return PlotlyData format directly
       count: mongoData.length,
       meta: {
         source: dataSource,

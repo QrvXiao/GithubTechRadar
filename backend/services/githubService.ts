@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { GitHubRepo } from '../types';
 import {logger} from '../utils/logger';
-import cacheService from './cacheService'; // ✅ 使用统一缓存
+import cacheService from './cacheService'; // ✅ Use unified cache
 
 interface RateLimitInfo {
   limit: number;
@@ -28,7 +28,7 @@ class GitHubService {
   async fetchTrendingRepos(language: string = '', timeRange: string = '7d'): Promise<GitHubRepo[]> {
     const cacheKey = `trending-${language || 'all'}-${timeRange}`;
 
-    // ✅ 使用统一缓存服务
+    // ✅ Use unified cache service
     const cached = cacheService.get(cacheKey);
     if (cached) {
       logger.info(`Cache hit for ${cacheKey}`);
@@ -53,7 +53,7 @@ class GitHubService {
 
       const processedData = this.processRepositories(response.data.items);
 
-      // ✅ 缓存5分钟
+      // ✅ Cache for 5 minutes
       cacheService.set(cacheKey, processedData, 5);
       
       logger.info(`Fetched ${processedData.length} trending repositories for ${language || 'all languages'}`);
@@ -62,7 +62,7 @@ class GitHubService {
     } catch (error) {
       logger.error('Error fetching trending repositories:', error);
       
-      // 如果API失败，尝试返回过期的缓存数据
+      // If API fails, try to return expired cache data
       const staleData = this.getStaleCache(cacheKey);
       if (staleData) {
         logger.warn(`Returning stale cache data for ${cacheKey}`);
@@ -73,9 +73,9 @@ class GitHubService {
     }
   }
 
-  // ✅ 获取过期缓存数据作为降级方案
+  // ✅ Get expired cache data as fallback
   private getStaleCache(key: string): any | null {
-    // 直接从缓存Map中获取，即使过期
+    // Get directly from cache Map, even if expired
     const cache = (cacheService as any).cache;
     const entry = cache.get(key);
     return entry ? entry.data : null;
@@ -142,7 +142,7 @@ class GitHubService {
     return this.rateLimitInfo;
   }
 
-  // ✅ 清除特定缓存
+  // ✅ Clear specific cache
   clearCache(pattern?: string): void {
     if (pattern) {
       const keys = cacheService.keys().filter(key => key.includes(pattern));
@@ -154,7 +154,7 @@ class GitHubService {
     }
   }
 
-  // ✅ 获取缓存统计
+  // ✅ Get cache statistics
   getCacheStats() {
     return cacheService.getStats();
   }
