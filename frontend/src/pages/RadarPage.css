@@ -294,7 +294,7 @@
   }
 }
 
-/* 更小屏幕优化 */
+/* Smaller screen optimization */
 @media (max-width: 480px) {
   .radar-page {
     padding: 4px;
@@ -335,13 +335,13 @@
     min-height: 250px;
   }
   
-  /* 修复 Plotly 图表在小屏幕的显示问题 */
+  /* Fix Plotly chart display on small screens */
   .chart-container > div {
     width: 100% !important;
   }
 }
 
-/* 横屏手机优化 */
+/* Landscape phone optimization */
 @media (max-width: 768px) and (orientation: landscape) {
   .radar-content {
     flex-direction: row;

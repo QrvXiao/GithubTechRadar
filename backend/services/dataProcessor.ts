@@ -9,7 +9,7 @@ interface LanguageStats {
 }
 
 export const transformToPlotlyData = (repos: GitHubRepo[]): PlotlyData[] => {
-  // ✅ 创建缓存键（基于数据内容的哈希）
+  // Create cache key (hash based on data content)
   const dataHash = repos.map(r => `${r.id}-${r.stargazers_count}`).join('').slice(0, 50);
   const cacheKey = `plotly-${dataHash}`;
 
@@ -43,13 +43,13 @@ export const transformToPlotlyData = (repos: GitHubRepo[]): PlotlyData[] => {
     name: 'Trending Repos',
   }];
 
-  // ✅ 缓存30分钟
+  // Cache for 30 minutes
   cacheService.set(cacheKey, result, 30);
   return result;
 };
 
 export const aggregateLanguageData = (repos: GitHubRepo[]) => {
-  // ✅ 创建缓存键
+  // Create cache key
   const dataHash = repos.map(r => r.id).join('-').slice(0, 50);
   const cacheKey = `aggregate-${dataHash}`;
 
@@ -88,7 +88,7 @@ export const aggregateLanguageData = (repos: GitHubRepo[]) => {
       .slice(0, 5)
   }));
 
-  // ✅ 缓存30分钟
+  // Cache for 30 minutes
   cacheService.set(cacheKey, result, 30);
   return result;
 };
@@ -99,7 +99,7 @@ function calculateTrendingScore(stats: LanguageStats): number {
   return Math.round(starScore + repoScore);
 }
 
-// ✅ 导出缓存控制函数
+// Export cache control function
 export const clearProcessorCache = () => {
   const keys = cacheService.keys().filter(key => 
     key.startsWith('plotly-') || key.startsWith('aggregate-')

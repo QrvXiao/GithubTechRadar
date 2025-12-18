@@ -8,29 +8,29 @@ import { logger } from '../utils/logger';
 class ScheduledJobService {
   private jobs: Map<string, cron.ScheduledTask> = new Map();
 
-  // 启动所有定时任务
+  // Start all scheduled jobs
   startAll(): void {
     this.startWeeklyDataFetch();
     this.startDailyCleanup();
     logger.info('✅ All scheduled jobs started');
   }
 
-  // 每周一凌晨2点自动拉取数据
+  // Automatically fetch data every Monday at 2:00 AM
   private startWeeklyDataFetch(): void {
-    // Cron格式: 秒 分 时 日 月 星期
-    // '0 2 * * 1' = 每周一 02:00
+    // Cron format: second minute hour day month weekday
+    // '0 2 * * 1' = Every Monday 02:00
     const job = cron.schedule('0 2 * * 1', async () => {
       logger.info('🔄 Starting weekly data fetch job...');
       await this.fetchAndCacheData();
     }, {
-      timezone: 'Asia/Shanghai' // 根据你的时区调整
+      timezone: 'Asia/Shanghai' // Adjust according to your timezone
     });
 
     this.jobs.set('weeklyDataFetch', job);
     logger.info('📅 Weekly data fetch job scheduled (Every Monday 2:00 AM)');
   }
 
-  // 每天凌晨3点清理过期数据
+  // Clean up expired data every day at 3:00 AM
   private startDailyCleanup(): void {
     const job = cron.schedule('0 3 * * *', async () => {
       logger.info('🧹 Starting daily cleanup job...');
@@ -43,7 +43,7 @@ class ScheduledJobService {
     logger.info('📅 Daily cleanup job scheduled (Every day 3:00 AM)');
   }
 
-  // 核心：拉取并缓存数据到MongoDB
+  // Core: Fetch and cache data to MongoDB
   async fetchAndCacheData(): Promise<void> {
     const timeRanges = ['7d', '30d'] as const;
     const languages = ['', 'JavaScript', 'Python', 'TypeScript', 'Java', 'Go', 'Rust'];
@@ -56,7 +56,7 @@ class ScheduledJobService {
         try {
           logger.info(`Fetching: ${language || 'all'} - ${timeRange}`);
           
-          // 从GitHub API拉取数据
+          // Fetch data from GitHub API
           const githubData = await githubService.fetchTrendingRepos(language, timeRange);
           
           if (githubData.length === 0) {
@@ -64,7 +64,7 @@ class ScheduledJobService {
             continue;
           }
 
-          // ✅ 保存每个repo的数据（而不是聚合数据）
+          // Save each repo's data (instead of aggregated data)
           for (const repo of githubData) {
             if (!repo.language) continue;
             
@@ -97,7 +97,7 @@ class ScheduledJobService {
           successCount++;
           logger.info(`✅ Cached ${githubData.length} repos for ${language || 'all'} - ${timeRange}`);
           
-          // 避免频繁请求API，添加延迟
+          // Add delay to avoid frequent API requests
           await this.sleep(2000);
           
         } catch (error) {
@@ -110,7 +110,7 @@ class ScheduledJobService {
     logger.info(`📊 Job completed: ${successCount} success, ${errorCount} errors`);
   }
 
-  // 清理超过30天的旧数据
+  // Clean up data older than 30 days
   private async cleanupOldData(): Promise<void> {
     try {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -129,7 +129,7 @@ class ScheduledJobService {
     }
   }
 
-  // 手动触发数据拉取（用于测试或紧急更新）
+  // Manually trigger data fetch (for testing or emergency updates)
   async triggerManualFetch(): Promise<{ success: boolean; message: string }> {
     try {
       logger.info('🚀 Manual data fetch triggered');
@@ -147,7 +147,7 @@ class ScheduledJobService {
     }
   }
 
-  // 停止所有任务
+  // Stop all jobs
   stopAll(): void {
     this.jobs.forEach((job, name) => {
       job.stop();
@@ -156,7 +156,7 @@ class ScheduledJobService {
     this.jobs.clear();
   }
 
-  // 获取任务状态
+  // Get job status
   getStatus(): { name: string; running: boolean }[] {
     return Array.from(this.jobs.entries()).map(([name, job]) => ({
       name,

@@ -20,7 +20,7 @@ function createError(error: unknown): Error {
   return new Error('An unknown error occurred');
 }
 
-// 转换MongoDB聚合数据为PlotlyData格式
+// Convert MongoDB aggregated data to PlotlyData format
 function mongoToPlotlyData(mongoData: any[]): PlotlyData[] {
   if (!mongoData || mongoData.length === 0) return [];
   
@@ -49,7 +49,7 @@ function mongoToPlotlyData(mongoData: any[]): PlotlyData[] {
 // GET /api/radar-data - Optimized with MongoDB caching
 router.get('/radar-data', validateQuery, async (req: Request, res: Response) => {
   try {
-    // 使用验证后的查询参数
+    // Use validated query parameters
     const validatedQuery = (req as any).validatedQuery || req.query;
     const { language, timeRange, limit } = validatedQuery;
     
@@ -63,7 +63,7 @@ router.get('/radar-data', validateQuery, async (req: Request, res: Response) => 
     }
     filter.timeRange = timeRangeStr;
 
-    // ✅ Step 1: 尝试从MongoDB获取数据
+    // Step 1: Try to get data from MongoDB
     let mongoData = await TechRadar.find(filter)
       .sort({ trendingScore: -1 })
       .limit(limitNum)
@@ -73,11 +73,11 @@ router.get('/radar-data', validateQuery, async (req: Request, res: Response) => 
     let isFresh = true;
     let lastUpdated: Date | null = null;
 
-    // ✅ Step 2: 检查数据新鲜度
+    // Step 2: Check data freshness
     if (mongoData.length > 0) {
       lastUpdated = mongoData[0].lastUpdated as Date;
       const dataAge = Date.now() - new Date(lastUpdated).getTime();
-      const maxAge = 7 * 24 * 60 * 60 * 1000; // 7天
+      const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
       
       isFresh = dataAge < maxAge;
       
@@ -86,7 +86,7 @@ router.get('/radar-data', validateQuery, async (req: Request, res: Response) => 
       }
     }
 
-    // ✅ Step 3: 如果没有数据或数据过期，从GitHub拉取
+    // Step 3: If no data or data is stale, fetch from GitHub
     if (mongoData.length === 0 || !isFresh) {
       console.log('📡 Fetching fresh data from GitHub API...');
       dataSource = 'live';
@@ -97,7 +97,7 @@ router.get('/radar-data', validateQuery, async (req: Request, res: Response) => 
         if (githubData.length > 0) {
           const processedData = aggregateLanguageData(githubData);
           
-          // ✅ 更新MongoDB缓存（异步，不阻塞响应）
+          // Update MongoDB cache (async, doesn't block response)
           Promise.all(
             processedData.map((item: any) =>
               TechRadar.findOneAndUpdate(
@@ -111,20 +111,20 @@ router.get('/radar-data', validateQuery, async (req: Request, res: Response) => 
           mongoData = processedData.slice(0, limitNum);
           lastUpdated = new Date();
         } else if (mongoData.length > 0) {
-          // 如果API失败但有旧数据，使用旧数据
+          // If API fails but we have old data, use old data
           console.log('⚠️ Using stale cache as fallback');
           dataSource = 'stale-cache';
         }
       } catch (error) {
         console.error('GitHub API error:', error);
         if (mongoData.length === 0) {
-          throw error; // 没有缓存数据时才抛出错误
+          throw error; // Only throw error when there's no cached data
         }
-        dataSource = 'stale-cache'; // 有缓存数据时降级使用
+        dataSource = 'stale-cache'; // Fallback to cache when available
       }
     }
 
-    // ✅ Step 4: 转换为前端需要的格式
+    // Step 4: Convert to frontend format
     const plotlyData = mongoToPlotlyData(mongoData);
 
     res.json({
@@ -146,7 +146,7 @@ router.get('/radar-data', validateQuery, async (req: Request, res: Response) => 
   }
 });
 
-// ✅ 缓存管理端点
+// Cache management endpoints
 router.get('/cache/stats', (req: Request, res: Response) => {
   res.json({
     success: true,
@@ -178,7 +178,7 @@ router.post('/cache/cleanup', (req: Request, res: Response) => {
   });
 });
 
-// ✅ 手动触发数据预热
+// Manually trigger data warmup
 import scheduledJob from '../services/scheduledJob';
 
 router.post('/cache/warmup', async (req: Request, res: Response) => {

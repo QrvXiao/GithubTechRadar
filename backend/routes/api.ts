@@ -15,7 +15,7 @@ router.get('/trending', async (req: Request, res: Response): Promise<void> => {
     const limitNum = parseInt(limit as string) || 100;
     const timeRangeStr = timeRange as string;
     
-    // ✅ 优先从MongoDB获取repo数据
+    // Try to get repo data from MongoDB first
     const filter: any = { timeRange: timeRangeStr };
     if (language && language !== 'all') {
       filter.language = language;
@@ -29,7 +29,7 @@ router.get('/trending', async (req: Request, res: Response): Promise<void> => {
     let dataSource = 'cache';
     let fromMongo = true;
 
-    // ✅ 如果没有缓存数据，从GitHub API拉取
+    // If no cached data, fetch from GitHub API
     if (repos.length === 0) {
       console.log('📡 No cached data, fetching from GitHub API...');
       dataSource = 'live';
@@ -37,7 +37,7 @@ router.get('/trending', async (req: Request, res: Response): Promise<void> => {
       
       const githubRepos: GitHubRepo[] = await githubService.fetchTrendingRepos(language as string || '', timeRangeStr);
       
-      // 转换GitHub数据为我们的格式
+      // Convert GitHub data to our format
       const repoData = githubRepos
         .filter(repo => repo.language && typeof repo.stargazers_count === 'number')
         .slice(0, limitNum)
@@ -56,10 +56,10 @@ router.get('/trending', async (req: Request, res: Response): Promise<void> => {
           timeRange: timeRangeStr as '1d' | '7d' | '30d'
         }));
       
-      repos = repoData as any; // 临时类型转换
+      repos = repoData as any; // temporary type conversion
     }
 
-    // ✅ 转换为Plotly格式 - 每个repo一个数据点
+    // Convert to Plotly format - one data point per repo
     const r: number[] = repos.map(repo => repo.stars);
     const theta: string[] = repos.map(repo => repo.language);
     const text: string[] = repos.map(repo => 

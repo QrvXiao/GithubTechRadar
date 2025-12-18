@@ -21,10 +21,10 @@ mongoose.connect(process.env.MONGODB_URI as string)
   .then(() => {
     console.log('✅ MongoDB connected');
     
-    // ✅ 启动定时任务
+    // Start scheduled jobs
     scheduledJob.startAll();
     
-    // ✅ 服务器启动时预热缓存（可选）
+    // Warm up cache on server start (optional)
     if (process.env.WARMUP_ON_START === 'true') {
       logger.info('🔥 Starting cache warmup...');
       scheduledJob.triggerManualFetch()
@@ -53,7 +53,7 @@ const server = app.listen(PORT, () => {
   console.log(`📅 Scheduled jobs: ${scheduledJob.getStatus().length} active`);
 });
 
-// ✅ 优雅关闭
+// Graceful shutdown
 process.on('SIGTERM', () => {
   logger.info('SIGTERM signal received: closing HTTP server');
   scheduledJob.stopAll();

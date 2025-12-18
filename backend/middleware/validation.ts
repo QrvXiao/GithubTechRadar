@@ -16,7 +16,7 @@ export const validateQuery = (req: Request, res: Response, next: NextFunction) =
     });
   }
   
-  // 将验证后的值存储到req对象中，而不是覆盖req.query
+  // Store validated values in req object instead of overwriting req.query
   (req as any).validatedQuery = value;
   next();
 };

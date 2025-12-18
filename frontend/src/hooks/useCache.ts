@@ -22,7 +22,7 @@ export function usePersistedCache<T>(
       if (cached) {
         const parsed: CacheEntry<T> = JSON.parse(cached);
         
-        // check version and expiry
+        // Check version and expiry
         if (parsed.version === CACHE_VERSION && 
             Date.now() - parsed.timestamp < duration) {
           console.log(`🎯 Using localStorage cache for ${key}`);
@@ -60,7 +60,7 @@ export function usePersistedCache<T>(
         
         const result = await stableFetcher();
         
-        // store at localStorage
+        // Store in localStorage
         const cacheEntry: CacheEntry<T> = {
           data: result,
           timestamp: Date.now(),
